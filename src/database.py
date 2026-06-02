@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 
-from sqlalchemy import create_engine, event, text
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
@@ -114,9 +114,21 @@ def init_db(db_path: Path | None = None, *, drop_existing: bool = False) -> None
         if drop_existing:
             Base.metadata.drop_all(engine)
         Base.metadata.create_all(engine)
+        _apply_migrations(engine)
         logger.info("Database initialized at %s", db_path or DEFAULT_DB_PATH)
     except SQLAlchemyError as exc:
         raise DatabaseError(f"Failed to initialize database: {exc}") from exc
+
+
+def _apply_migrations(engine: Engine) -> None:
+    """Add columns introduced after initial deploy (safe for existing SQLite files)."""
+    inspector = inspect(engine)
+    if not inspector.has_table("price_logs"):
+        return
+    columns = {col["name"] for col in inspector.get_columns("price_logs")}
+    if "notes" not in columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE price_logs ADD COLUMN notes TEXT"))
 
 
 def seed_sample_data(db_path: Path | None = None) -> None:

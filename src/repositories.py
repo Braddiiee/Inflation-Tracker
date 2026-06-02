@@ -19,6 +19,7 @@ from src.models import Category, PriceLog, Product, Store
 from src.validation import (
     normalize_name,
     validate_date_recorded,
+    validate_notes,
     validate_positive_number,
     validate_unit_type,
 )
@@ -261,12 +262,14 @@ class PriceLogRepository:
         quantity: float,
         unit_type: str,
         date_recorded: str | date,
+        notes: str | None = None,
     ) -> PriceLog:
         """Insert one price observation after validation."""
         price = validate_positive_number(price_total, "price_total")
         qty = validate_positive_number(quantity, "quantity")
         unit = validate_unit_type(unit_type)
         recorded = validate_date_recorded(date_recorded)
+        note_text = validate_notes(notes)
 
         ProductRepository(self._session).get_by_id(product_id)
         StoreRepository(self._session).get_by_id(store_id)
@@ -278,6 +281,7 @@ class PriceLogRepository:
             quantity=qty,
             unit_type=unit,
             date_recorded=recorded,
+            notes=note_text,
         )
         self._session.add(row)
         try:
@@ -342,6 +346,7 @@ class PriceLogRepository:
         quantity: float | None = None,
         unit_type: str | None = None,
         date_recorded: str | date | None = None,
+        notes: str | None = None,
     ) -> PriceLog:
         """Update any subset of fields on an existing log."""
         row = self.get_by_id(log_id)
@@ -359,6 +364,8 @@ class PriceLogRepository:
             row.unit_type = validate_unit_type(unit_type)
         if date_recorded is not None:
             row.date_recorded = validate_date_recorded(date_recorded)
+        if notes is not None:
+            row.notes = validate_notes(notes)
         try:
             self._session.flush()
         except IntegrityError as exc:
@@ -380,11 +387,12 @@ class PriceLogRepository:
         quantity: float,
         unit_type: str,
         date_recorded: str | date,
+        notes: str | None = None,
     ) -> PriceLog:
         """
         High-level insert: resolve or create category, product, and store by name, then log price.
 
-        Returns the new PriceLog. Suitable for future UI form submission.
+        Returns the new PriceLog. Suitable for UI form submission.
         """
         categories = CategoryRepository(self._session)
         products = ProductRepository(self._session)
@@ -409,4 +417,5 @@ class PriceLogRepository:
             quantity=quantity,
             unit_type=unit_type,
             date_recorded=date_recorded,
+            notes=notes,
         )

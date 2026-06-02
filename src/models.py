@@ -86,6 +86,7 @@ class PriceLog(Base):
     quantity: Mapped[float] = mapped_column(Real, nullable=False)
     unit_type: Mapped[str] = mapped_column(String(16), nullable=False)
     date_recorded: Mapped[str] = mapped_column(Date, nullable=False)
+    notes: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     product: Mapped[Product] = relationship(back_populates="price_logs")
     store: Mapped[Store] = relationship(back_populates="price_logs")

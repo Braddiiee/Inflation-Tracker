@@ -74,3 +74,18 @@ def validate_date_recorded(value: str | date) -> str:
             field="date_recorded",
         )
     return recorded.isoformat()
+
+
+def validate_notes(value: str | None) -> str | None:
+    """Optional notes field; strip and enforce max length when provided."""
+    if value is None:
+        return None
+    text = value.strip()
+    if not text:
+        return None
+    if len(text) > 500:
+        raise ValidationError(
+            "Notes must be 500 characters or fewer.",
+            field="notes",
+        )
+    return text
