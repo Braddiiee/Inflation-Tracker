@@ -1,0 +1,14 @@
+# Grocery Inflation Tracker — MVP dependencies
+# Pin major versions for reproducible STEAM/demo environments.
+
+streamlit>=1.32.0,<2.0.0
+pandas>=2.2.0,<3.0.0
+plotly>=5.20.0,<6.0.0
+sqlalchemy>=2.0.0,<3.0.0
+
+# Optional (recommended in architecture doc for input validation — wire in post-scaffold)
+# pydantic>=2.0.0,<3.0.0
+
+# Development / quality (install separately or use requirements-dev.txt)
+# pytest>=8.0.0,<9.0.0
+# ruff>=0.4.0,<1.0.0
