@@ -14,7 +14,7 @@ def render_app_header() -> None:
     st.title("Grocery Inflation Tracker")
     st.caption(
         "Log local grocery prices to build your personal basket history. "
-        "Dashboard charts coming soon."
+        "Open the Dashboard page for interactive charts."
     )
 
 

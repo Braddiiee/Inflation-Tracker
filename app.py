@@ -3,8 +3,7 @@ Grocery Inflation Tracker — application entry point.
 
 Run: streamlit run app.py
 
-Use the sidebar to open **Add Price Entry** or **Manage Records**.
-Analytics dashboard is not implemented yet.
+Use the sidebar to open **Add Price Entry**, **Manage Records**, or **Dashboard**.
 """
 
 import streamlit as st
@@ -25,6 +24,7 @@ Track local grocery prices, manage your records, and prepare for basket inflatio
 |------|-------------|
 | **Add Price Entry** | Log a new item price (item, store, category, date, notes). |
 | **Manage Records** | Search, sort, paginate, edit, or delete saved entries. |
+| **Dashboard** | Interactive price, basket, store, and inflation charts. |
 
 Select a page from the **sidebar** to get started.
 """
