@@ -12,7 +12,7 @@ from sqlalchemy import (
     Date,
     ForeignKey,
     Index,
-    Real,
+    Float,
     String,
     UniqueConstraint,
 )
@@ -82,8 +82,8 @@ class PriceLog(Base):
         ForeignKey("stores.store_id", ondelete="RESTRICT"),
         nullable=False,
     )
-    price_total: Mapped[float] = mapped_column(Real, nullable=False)
-    quantity: Mapped[float] = mapped_column(Real, nullable=False)
+    price_total: Mapped[float] = mapped_column(Float, nullable=False)
+    quantity: Mapped[float] = mapped_column(Float, nullable=False)
     unit_type: Mapped[str] = mapped_column(String(16), nullable=False)
     date_recorded: Mapped[str] = mapped_column(Date, nullable=False)
     notes: Mapped[str | None] = mapped_column(String(500), nullable=True)

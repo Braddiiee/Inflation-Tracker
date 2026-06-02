@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.data_processor import BasketPeriodChange, ItemExtremeChange
 from src.entry_service import PriceEntryResult
 
 
@@ -55,3 +56,72 @@ def render_flash_message(session_key: str) -> None:
     if message:
         st.success(message)
         st.session_state[session_key] = None
+
+
+def render_dashboard_card(
+    label: str,
+    value: str,
+    *,
+    delta: str | None = None,
+    help_text: str | None = None,
+    delta_color: str = "inverse",
+) -> None:
+    """Bordered KPI card for the main dashboard row."""
+    with st.container(border=True):
+        st.metric(
+            label=label,
+            value=value,
+            delta=delta,
+            delta_color=delta_color,  # type: ignore[arg-type]
+            help=help_text,
+        )
+
+
+def render_basket_change_card(
+    title: str,
+    change: BasketPeriodChange,
+    *,
+    help_text: str,
+) -> None:
+    """Card for weekly / monthly basket change (% and absolute)."""
+    with st.container(border=True):
+        if change.percent_change is None or change.current_cost is None:
+            st.metric(title, "—", help=help_text)
+            return
+        st.metric(
+            title,
+            f"{change.percent_change:+.2f}%",
+            delta=f"{change.price_difference:+,.2f} basket"
+            if change.price_difference is not None
+            else None,
+            delta_color="inverse",
+            help=help_text,
+        )
+        if change.previous_cost is not None:
+            st.caption(
+                f"Basket {change.previous_cost:,.2f} → {change.current_cost:,.2f}"
+            )
+
+
+def render_item_inflation_card(
+    title: str,
+    item: ItemExtremeChange | None,
+    *,
+    help_text: str,
+    rising: bool,
+) -> None:
+    """Card for highest / lowest inflation item."""
+    with st.container(border=True):
+        if item is None:
+            st.metric(title, "—", help=help_text)
+            return
+        pct = item.percentage_change
+        arrow = "↑" if rising else "↓"
+        st.metric(
+            title,
+            item.item_name,
+            delta=f"{arrow} {pct:+.1f}% unit price",
+            delta_color="inverse" if rising else "normal",
+            help=help_text,
+        )
+        st.caption(f"{item.store_name} · {item.start_date} → {item.end_date}")

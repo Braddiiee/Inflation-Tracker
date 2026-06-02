@@ -447,6 +447,93 @@ def monthly_inflation_estimate(df: pd.DataFrame) -> list[MonthlyInflationRow]:
     return rows
 
 
+@dataclass(frozen=True)
+class BasketPeriodChange:
+    """Basket cost now vs a prior point in time."""
+
+    current_cost: float | None
+    previous_cost: float | None
+    price_difference: float | None
+    percent_change: float | None
+    current_as_of: str | None
+    previous_as_of: str | None
+
+
+@dataclass(frozen=True)
+class DashboardMetrics:
+    """Headline KPIs for the product dashboard."""
+
+    current_basket_cost: float | None
+    weekly_change: BasketPeriodChange
+    monthly_change: BasketPeriodChange
+    highest_inflation_item: ItemExtremeChange | None
+    lowest_inflation_item: ItemExtremeChange | None
+    observation_count: int
+    item_count: int
+    average_unit_price: float | None
+
+
+def basket_cost_change(
+    df: pd.DataFrame,
+    *,
+    days: int,
+    reference_date: pd.Timestamp | None = None,
+) -> BasketPeriodChange:
+    """
+    Compare basket cost at reference_date vs `days` earlier.
+
+    Uses basket_cost(as_of) at each anchor so the basket reflects latest
+    known price per item on or before each date.
+    """
+    if df.empty:
+        return BasketPeriodChange(None, None, None, None, None, None)
+
+    ref = reference_date if reference_date is not None else df["date_recorded"].max()
+    ref_str = ref.strftime("%Y-%m-%d")
+    prior = ref - pd.Timedelta(days=days)
+    prior_str = prior.strftime("%Y-%m-%d")
+
+    current = basket_cost(df, as_of_date=ref_str)
+    previous = basket_cost(df, as_of_date=prior_str)
+
+    if current is None:
+        return BasketPeriodChange(None, previous, None, None, ref_str, prior_str)
+
+    diff = price_difference(previous, current) if previous is not None else None
+    pct = percentage_change(previous, current) if previous is not None else None
+
+    return BasketPeriodChange(
+        current_cost=current,
+        previous_cost=previous,
+        price_difference=diff,
+        percent_change=pct,
+        current_as_of=ref_str,
+        previous_as_of=prior_str,
+    )
+
+
+def compute_dashboard_metrics(
+    df: pd.DataFrame,
+    *,
+    by_store: bool = True,
+) -> DashboardMetrics:
+    """All dashboard card values for the filtered dataset."""
+    ref_date = df["date_recorded"].max() if not df.empty else None
+    return DashboardMetrics(
+        current_basket_cost=basket_cost(
+            df,
+            as_of_date=ref_date.strftime("%Y-%m-%d") if ref_date is not None else None,
+        ),
+        weekly_change=basket_cost_change(df, days=7, reference_date=ref_date),
+        monthly_change=basket_cost_change(df, days=30, reference_date=ref_date),
+        highest_inflation_item=highest_increase(df, by_store=by_store),
+        lowest_inflation_item=highest_decrease(df, by_store=by_store),
+        observation_count=len(df),
+        item_count=int(df["item_name"].nunique()) if not df.empty else 0,
+        average_unit_price=average_unit_price(df),
+    )
+
+
 def compute_analytics_summary(
     df: pd.DataFrame,
     *,
