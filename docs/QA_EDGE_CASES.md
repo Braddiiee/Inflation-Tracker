@@ -29,6 +29,7 @@
 | ID | Case | Expected | Test |
 |----|------|----------|------|
 | E-20 | Page number > total pages | Clamps to last page | `test_edge_cases` |
+| E-23 | page_size=1 (valid option) | Returns single row per page | `test_record_service` |
 | E-21 | Search with no hits | Empty table | `test_edge_cases` |
 | E-22 | Product exists under different category | ValidationError on import/save | `test_entry_service` |
 

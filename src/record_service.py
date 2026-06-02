@@ -26,7 +26,7 @@ SortField = Literal[
 SortOrder = Literal["asc", "desc"]
 
 DEFAULT_PAGE_SIZE = 10
-PAGE_SIZE_OPTIONS = (5, 10, 25, 50)
+PAGE_SIZE_OPTIONS = (1, 5, 10, 25, 50)
 
 
 @dataclass(frozen=True)
