@@ -1,0 +1,7 @@
+# Streamlit theme and server defaults (customize during UI phase).
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
