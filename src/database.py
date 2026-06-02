@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import contextmanager
+from datetime import date
 from pathlib import Path
 from typing import Generator
 
@@ -158,7 +159,7 @@ def seed_sample_data(db_path: Path | None = None) -> None:
                     price_total=500.0,
                     quantity=1.0,
                     unit_type="kg",
-                    date_recorded="2026-05-01",
+                    date_recorded=date(2026, 5, 1),
                 ),
                 PriceLog(
                     product_id=rice.product_id,
@@ -166,7 +167,7 @@ def seed_sample_data(db_path: Path | None = None) -> None:
                     price_total=280.0,
                     quantity=0.5,
                     unit_type="kg",
-                    date_recorded="2026-05-08",
+                    date_recorded=date(2026, 5, 8),
                 ),
             ]
         )

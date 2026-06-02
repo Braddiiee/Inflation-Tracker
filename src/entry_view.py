@@ -17,6 +17,7 @@ from src.entry_service import (
     validate_entry_form,
 )
 from src.exceptions import DatabaseError, ValidationError
+from src.theme import apply_theme
 from src.ui_components import (
     clear_field_errors,
     field_error_message,
@@ -43,6 +44,7 @@ def _init_session_state() -> None:
 def render_add_price_page() -> None:
     """Render the full Add Price Entry form and handle submission."""
     ensure_database_ready()
+    apply_theme()
     _init_session_state()
 
     render_app_header()

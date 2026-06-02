@@ -15,6 +15,7 @@ ENV/
 # Local database (regenerate locally)
 data/*.db
 data/*.db-journal
+data/backups/
 
 # Environment and secrets
 .env

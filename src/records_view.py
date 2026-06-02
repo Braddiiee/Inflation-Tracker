@@ -9,6 +9,7 @@ from datetime import date, datetime
 import streamlit as st
 
 from src.entry_service import PriceEntryInput, ensure_database_ready, list_category_names
+from src.theme import apply_theme
 from src.exceptions import DatabaseError, NotFoundError, ValidationError
 from src.record_service import (
     DEFAULT_PAGE_SIZE,
@@ -358,10 +359,11 @@ def _render_edit_form(record: PriceRecordRow) -> None:
 def render_manage_records_page() -> None:
     """Main entry: view, edit, and delete price records."""
     ensure_database_ready()
+    apply_theme()
     _init_records_state()
 
     st.title("Manage Records")
-    st.caption("View, edit, or delete saved price entries. Analytics dashboard coming later.")
+    st.caption("View, edit, or delete saved price entries.")
 
     render_flash_message("records_flash")
 

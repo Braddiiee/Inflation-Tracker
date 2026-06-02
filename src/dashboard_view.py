@@ -19,6 +19,7 @@ from src.data_processor import (
     load_analytics_dataframe,
 )
 from src.entry_service import ensure_database_ready
+from src.theme import apply_theme
 from src.ui_components import (
     render_basket_change_card,
     render_dashboard_card,
@@ -282,6 +283,7 @@ def _render_charts(
 def render_dashboard_page() -> None:
     """Full product dashboard."""
     ensure_database_ready()
+    apply_theme()
 
     st.title("Dashboard")
     st.caption(

@@ -18,6 +18,7 @@ from src.exceptions import DatabaseError, NotFoundError, ValidationError
 from src.models import Category, PriceLog, Product, Store
 from src.validation import (
     normalize_name,
+    to_date_recorded,
     validate_date_recorded,
     validate_notes,
     validate_positive_number,
@@ -268,7 +269,7 @@ class PriceLogRepository:
         price = validate_positive_number(price_total, "price_total")
         qty = validate_positive_number(quantity, "quantity")
         unit = validate_unit_type(unit_type)
-        recorded = validate_date_recorded(date_recorded)
+        recorded = to_date_recorded(date_recorded)
         note_text = validate_notes(notes)
 
         ProductRepository(self._session).get_by_id(product_id)
@@ -378,7 +379,7 @@ class PriceLogRepository:
         if unit_type is not None:
             row.unit_type = validate_unit_type(unit_type)
         if date_recorded is not None:
-            row.date_recorded = validate_date_recorded(date_recorded)
+            row.date_recorded = to_date_recorded(date_recorded)
         if notes is not None:
             row.notes = validate_notes(notes)
         try:

@@ -76,6 +76,12 @@ def validate_date_recorded(value: str | date) -> str:
     return recorded.isoformat()
 
 
+def to_date_recorded(value: str | date) -> date:
+    """Return a Python date for ORM Date columns (after validation)."""
+    iso = validate_date_recorded(value)
+    return datetime.strptime(iso, "%Y-%m-%d").date()
+
+
 def validate_notes(value: str | None) -> str | None:
     """Optional notes field; strip and enforce max length when provided."""
     if value is None:
