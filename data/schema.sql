@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS price_logs (
     quantity       REAL NOT NULL CHECK (quantity > 0),
     unit_type      TEXT NOT NULL CHECK (unit_type IN ('kg', 'g', 'l', 'ml', 'unit')),
     date_recorded  TEXT NOT NULL,
+    notes          TEXT,
     FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE RESTRICT,
     FOREIGN KEY (store_id) REFERENCES stores (store_id) ON DELETE RESTRICT
 );

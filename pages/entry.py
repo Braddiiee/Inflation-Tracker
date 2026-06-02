@@ -1,8 +1,10 @@
 """
-Data entry view.
+Add Price Entry (Streamlit multi-page shim).
 
-Responsibilities (future):
-- CRUD form: item, store, price, date, quantity, unit of measure
-- Client-side validation hooks before DAL insert/update/delete
-- Feedback for integrity failures (negative price, future date, non-numeric input)
+Hidden from navigation when using `streamlit run app.py` as the main entry.
+Use app.py for the single-page MVP experience.
 """
+
+from src.entry_view import render_add_price_page
+
+render_add_price_page()

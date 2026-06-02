@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 from src.database import get_session, init_db
@@ -51,14 +52,14 @@ class PriceEntryResult:
     unit_label: str
 
 
-def ensure_database_ready() -> None:
+def ensure_database_ready(db_path: Path | None = None) -> None:
     """Create tables and apply migrations on first app load."""
-    init_db()
+    init_db(db_path)
 
 
-def list_category_names() -> list[str]:
+def list_category_names(db_path: Path | None = None) -> list[str]:
     """Return sorted category names for form suggestions."""
-    with get_session() as session:
+    with get_session(db_path) as session:
         return [c.category_name for c in CategoryRepository(session).list_all()]
 
 
@@ -113,7 +114,10 @@ def validate_entry_form(data: PriceEntryInput) -> dict[str, str]:
     return errors
 
 
-def save_price_entry(data: PriceEntryInput) -> PriceEntryResult:
+def save_price_entry(
+    data: PriceEntryInput,
+    db_path: Path | None = None,
+) -> PriceEntryResult:
     """
     Validate and persist a new price log.
 
@@ -133,7 +137,7 @@ def save_price_entry(data: PriceEntryInput) -> PriceEntryResult:
     recorded = validate_date_recorded(data.date_recorded)
     notes = validate_notes(data.notes)
 
-    with get_session() as session:
+    with get_session(db_path) as session:
         log: PriceLog = PriceLogRepository(session).insert_price_record(
             product_name=item,
             category_name=category,
