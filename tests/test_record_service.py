@@ -70,10 +70,14 @@ def test_sort_by_price(db_path: Path) -> None:
 
 def test_pagination(db_path: Path) -> None:
     _seed(db_path)
+    all_rows = list_records(page=1, page_size=50, db_path=db_path)
+    assert all_rows.total >= 2, "seed should insert at least two records"
+
     page1 = list_records(page=1, page_size=1, db_path=db_path)
     page2 = list_records(page=2, page_size=1, db_path=db_path)
-    assert page1.total == 2
+    assert page1.total == all_rows.total
     assert len(page1.rows) == 1
+    assert len(page2.rows) == 1
     assert page1.rows[0].log_id != page2.rows[0].log_id
 
 

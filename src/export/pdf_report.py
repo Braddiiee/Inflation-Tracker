@@ -14,7 +14,11 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from src.data_processor import compute_dashboard_metrics, load_analytics_dataframe
+from src.data_processor import (
+    compute_dashboard_metrics,
+    load_analytics_dataframe,
+    monthly_inflation_estimate,
+)
 
 
 def _styles():
@@ -120,10 +124,11 @@ def generate_pdf_report_bytes(*, db_path=None) -> bytes:
     story.append(Spacer(1, 14))
 
     # Monthly inflation
-    if metrics.monthly_inflation:
+    monthly_rows = monthly_inflation_estimate(df)
+    if monthly_rows:
         story.append(Paragraph("Monthly inflation", styles["heading"]))
         inf_rows = [["Month", "Basket cost", "MoM %"]]
-        for row in metrics.monthly_inflation:
+        for row in monthly_rows:
             inf_rows.append(
                 [
                     row.month,

@@ -68,11 +68,15 @@ def test_reject_future_date(db_path: Path) -> None:
             )
 
 
-def test_unique_product_name(db_path: Path) -> None:
+def test_unique_product_name(db_path) -> None:
     with get_session(db_path) as session:
         cat = CategoryRepository(session).create("Staples")
         ProductRepository(session).create("Rice", cat.category_id)
-        with pytest.raises(ValidationError):
+
+    with pytest.raises(ValidationError):
+        with get_session(db_path) as session:
+            cat = CategoryRepository(session).get_by_name("Staples")
+            assert cat is not None
             ProductRepository(session).create("Rice", cat.category_id)
 
 
