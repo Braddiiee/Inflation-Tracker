@@ -47,3 +47,11 @@ def render_success_message(result: PriceEntryResult) -> None:
         f"**{result.price_total:,.2f}** for {result.unit_label} on **{result.date_recorded}**. "
         f"Record ID: `{result.log_id}`."
     )
+
+
+def render_flash_message(session_key: str) -> None:
+    """Show and clear a one-shot success/info message from session state."""
+    message = st.session_state.get(session_key)
+    if message:
+        st.success(message)
+        st.session_state[session_key] = None

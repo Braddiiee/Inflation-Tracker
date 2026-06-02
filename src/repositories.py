@@ -301,6 +301,18 @@ class PriceLogRepository:
             raise NotFoundError(f"Price log id={log_id} not found.")
         return row
 
+    def list_enriched(self) -> list[PriceLog]:
+        """Load all price logs with product, category, and store relationships."""
+        stmt = (
+            select(PriceLog)
+            .options(
+                joinedload(PriceLog.product).joinedload(Product.category),
+                joinedload(PriceLog.store),
+            )
+            .order_by(PriceLog.date_recorded.desc(), PriceLog.log_id.desc())
+        )
+        return list(self._session.scalars(stmt).unique())
+
     def list_all(
         self,
         *,
@@ -317,7 +329,10 @@ class PriceLogRepository:
         """
         stmt = (
             select(PriceLog)
-            .options(joinedload(PriceLog.product), joinedload(PriceLog.store))
+            .options(
+                joinedload(PriceLog.product).joinedload(Product.category),
+                joinedload(PriceLog.store),
+            )
             .join(Product)
         )
         if product_id is not None:
@@ -411,6 +426,48 @@ class PriceLogRepository:
             )
 
         return self.create(
+            product_id=product.product_id,
+            store_id=store.store_id,
+            price_total=price_total,
+            quantity=quantity,
+            unit_type=unit_type,
+            date_recorded=date_recorded,
+            notes=notes,
+        )
+
+    def update_price_record(
+        self,
+        log_id: int,
+        product_name: str,
+        category_name: str,
+        store_name: str,
+        price_total: float,
+        quantity: float,
+        unit_type: str,
+        date_recorded: str | date,
+        notes: str | None = None,
+    ) -> PriceLog:
+        """
+        Update a log and resolve product/store/category by name (same rules as insert).
+        """
+        categories = CategoryRepository(self._session)
+        products = ProductRepository(self._session)
+        stores = StoreRepository(self._session)
+
+        category = categories.get_or_create(category_name)
+        store = stores.get_or_create(store_name)
+
+        product = products.get_by_name(product_name)
+        if product is None:
+            product = products.create(product_name, category.category_id)
+        elif product.category_id != category.category_id:
+            raise ValidationError(
+                f"Product '{product.product_name}' already exists under a different category.",
+                field="category_name",
+            )
+
+        return self.update(
+            log_id,
             product_id=product.product_id,
             store_id=store.store_id,
             price_total=price_total,
