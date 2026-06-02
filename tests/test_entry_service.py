@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
 
 import pytest
 
-from src.database import get_session, init_db, reset_engine
+from src.database import get_session
 from src.entry_service import (
     PriceEntryInput,
     list_category_names,
@@ -17,17 +16,10 @@ from src.entry_service import (
 from src.exceptions import ValidationError
 from src.repositories import PriceLogRepository
 
-
-@pytest.fixture
-def db_path(tmp_path: Path) -> Path:
-    path = tmp_path / "entry.db"
-    reset_engine()
-    init_db(path)
-    yield path
-    reset_engine()
+pytestmark = pytest.mark.unit
 
 
-def test_validate_rejects_empty_item(db_path: Path) -> None:
+def test_validate_rejects_empty_item(db_path) -> None:
     errors = validate_entry_form(
         PriceEntryInput(
             item_name="  ",
@@ -40,7 +32,7 @@ def test_validate_rejects_empty_item(db_path: Path) -> None:
     assert "item_name" in errors
 
 
-def test_save_with_notes(db_path: Path) -> None:
+def test_save_with_notes(db_path) -> None:
     result = save_price_entry(
         PriceEntryInput(
             item_name="Milk",

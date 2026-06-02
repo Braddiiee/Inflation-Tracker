@@ -103,12 +103,12 @@ def test_basket_cost_latest(sample_df: pd.DataFrame) -> None:
     assert basket_cost(sample_df) == pytest.approx(338.0)
 
 
-def test_highest_increase_is_rice(sample_df: pd.DataFrame) -> None:
-    """Rice unit price 500 → 560 (+12%) is the largest rise."""
-    inc = highest_increase(sample_df)
+def test_highest_increase_is_milk(sample_analytics_df: pd.DataFrame) -> None:
+    """Milk unit price 10 → 12 (+20%) exceeds Rice +12% in this fixture."""
+    inc = highest_increase(sample_analytics_df)
     assert inc is not None
-    assert inc.item_name == "Rice"
-    assert inc.percentage_change == pytest.approx(12.0)
+    assert inc.item_name == "Milk"
+    assert inc.percentage_change == pytest.approx(20.0)
 
 
 def test_highest_decrease_is_bread(sample_df: pd.DataFrame) -> None:

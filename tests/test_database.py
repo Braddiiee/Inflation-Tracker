@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
-from pathlib import Path
 
 import pytest
+
+pytestmark = [pytest.mark.unit, pytest.mark.integration]
 
 from src.database import get_session, init_db, reset_engine, seed_sample_data
 from src.exceptions import NotFoundError, ValidationError
