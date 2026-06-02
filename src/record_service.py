@@ -131,6 +131,23 @@ def _sort_key(row: PriceRecordRow, field: SortField):
     return row.date_recorded
 
 
+def fetch_all_records(
+    *,
+    search: str = "",
+    sort_by: SortField = "date_recorded",
+    sort_order: SortOrder = "desc",
+    db_path: Path | None = None,
+) -> list[PriceRecordRow]:
+    """Load every matching record (no pagination) for analytics."""
+    with get_session(db_path) as session:
+        logs = PriceLogRepository(session).list_enriched()
+
+    rows = [_log_to_row(log) for log in logs]
+    rows = [r for r in rows if _matches_search(r, search)]
+    rows.sort(key=lambda r: _sort_key(r, sort_by), reverse=(sort_order == "desc"))
+    return rows
+
+
 def list_records(
     *,
     search: str = "",
